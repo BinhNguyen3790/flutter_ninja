@@ -38,76 +38,35 @@ class _QuoteListState extends State<QuoteList> {
     });
   }
 
-  void showAddQuoteDialog() {
-    String newText = '';
-    String newAuthor = '';
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Add a new Quote"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(labelText: "Text"),
-                onChanged: (value) {
-                  newText = value;
-                },
-              ),
-              TextField(
-                decoration: InputDecoration(labelText: "Author"),
-                onChanged: (value) {
-                  newAuthor = value;
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (newText.isNotEmpty && newAuthor.isNotEmpty) {
-                  handleAdd(newText, newAuthor);
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Text("Add"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  void showQuoteDialog({
+    required String title,
+    required String initialText,
+    required String initialAuthor,
+    required void Function(String text, String author) onConfirm,
+  }) {
+    String text = initialText;
+    String author = initialAuthor;
 
-  void showEditQuoteDialog(int index) {
-    String updatedText = quotes[index].text;
-    String updatedAuthor = quotes[index].author;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Edit Quote"),
+          title: Text(title),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 decoration: InputDecoration(labelText: "Text"),
-                controller: TextEditingController(text: updatedText),
+                controller: TextEditingController(text: initialText),
                 onChanged: (value) {
-                  updatedText = value;
+                  text = value;
                 },
               ),
               TextField(
                 decoration: InputDecoration(labelText: "Author"),
-                controller: TextEditingController(text: updatedAuthor),
+                controller: TextEditingController(text: initialAuthor),
                 onChanged: (value) {
-                  updatedAuthor = value;
+                  author = value;
                 },
               ),
             ],
@@ -121,8 +80,8 @@ class _QuoteListState extends State<QuoteList> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (updatedText.isNotEmpty && updatedAuthor.isNotEmpty) {
-                  handleEdit(index, updatedText, updatedAuthor);
+                if (text.isNotEmpty && author.isNotEmpty) {
+                  onConfirm(text, author);
                   Navigator.of(context).pop(); // Close dialog
                 }
               },
@@ -131,6 +90,24 @@ class _QuoteListState extends State<QuoteList> {
           ],
         );
       },
+    );
+  }
+
+  void showAddQuoteDialog() {
+    showQuoteDialog(
+      title: "Add a new Quote",
+      initialText: '',
+      initialAuthor: '',
+      onConfirm: (text, author) => handleAdd(text, author),
+    );
+  }
+
+  void showEditQuoteDialog(int index) {
+    showQuoteDialog(
+      title: "Edit Quote",
+      initialText: quotes[index].text,
+      initialAuthor: quotes[index].author,
+      onConfirm: (text, author) => handleEdit(index, text, author),
     );
   }
 
@@ -195,9 +172,7 @@ class CartList extends StatelessWidget {
             SizedBox(height: 20),
             Text(
               "- ${quote.author} -",
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-              ),
+              style: TextStyle(fontStyle: FontStyle.italic),
             ),
             SizedBox(height: 40),
             Row(
