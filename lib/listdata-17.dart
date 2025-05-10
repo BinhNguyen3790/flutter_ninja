@@ -174,7 +174,11 @@ class CartList extends StatelessWidget {
               "- ${quote.author} -",
               style: TextStyle(fontStyle: FontStyle.italic),
             ),
-            SizedBox(height: 40),
+            SizedBox(height: 20),
+            Divider(
+              height: 40,
+              color: Colors.grey[400],
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
